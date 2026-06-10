@@ -1,0 +1,15 @@
+net.poljw002.AndroidAssignment1.android-annotation-experimental-1.4.1-0 C:\Users\jwpol\.gradle\caches\9.4.0\transforms\247ccce5640ce22807805a59f40d14f1\transformed\annotation-experimental-1.4.1\res
+net.poljw002.AndroidAssignment1.android-gdx-backend-android-1.14.0-1 C:\Users\jwpol\.gradle\caches\9.4.0\transforms\3cafb8ff9b8dc7a14f08174c334f10a2\transformed\gdx-backend-android-1.14.0\res
+net.poljw002.AndroidAssignment1.android-startup-runtime-1.1.1-2 C:\Users\jwpol\.gradle\caches\9.4.0\transforms\53997d1512006c096908180e950e3caf\transformed\startup-runtime-1.1.1\res
+net.poljw002.AndroidAssignment1.android-core-1.15.0-3 C:\Users\jwpol\.gradle\caches\9.4.0\transforms\55907252bb36a8c60586b436fec7d2ba\transformed\core-1.15.0\res
+net.poljw002.AndroidAssignment1.android-profileinstaller-1.3.0-4 C:\Users\jwpol\.gradle\caches\9.4.0\transforms\6cc98cb43a352d334f91939c70a3f384\transformed\profileinstaller-1.3.0\res
+net.poljw002.AndroidAssignment1.android-lifecycle-runtime-2.6.2-5 C:\Users\jwpol\.gradle\caches\9.4.0\transforms\87512cef1681e679228c4956e0dd286c\transformed\lifecycle-runtime-2.6.2\res
+net.poljw002.AndroidAssignment1.android-core-runtime-2.2.0-6 C:\Users\jwpol\.gradle\caches\9.4.0\transforms\b8052d3a748968cd71fe3bbe1774732c\transformed\core-runtime-2.2.0\res
+net.poljw002.AndroidAssignment1.android-tracing-1.2.0-7 C:\Users\jwpol\.gradle\caches\9.4.0\transforms\f8663d775084e5b03ea5103ae56f78ae\transformed\tracing-1.2.0\res
+net.poljw002.AndroidAssignment1.android-pngs-8 D:\BallGameFolder2\android\build\generated\res\pngs\debug
+net.poljw002.AndroidAssignment1.android-resValues-9 D:\BallGameFolder2\android\build\generated\res\resValues\debug
+net.poljw002.AndroidAssignment1.android-packageDebugResources-10 D:\BallGameFolder2\android\build\intermediates\incremental\debug\packageDebugResources\merged.dir
+net.poljw002.AndroidAssignment1.android-packageDebugResources-11 D:\BallGameFolder2\android\build\intermediates\incremental\debug\packageDebugResources\stripped.dir
+net.poljw002.AndroidAssignment1.android-debug-12 D:\BallGameFolder2\android\build\intermediates\merged_res\debug\mergeDebugResources
+net.poljw002.AndroidAssignment1.android-android-13 D:\BallGameFolder2\android\res
+net.poljw002.AndroidAssignment1.android-debug-14 D:\BallGameFolder2\android\src\debug\res
