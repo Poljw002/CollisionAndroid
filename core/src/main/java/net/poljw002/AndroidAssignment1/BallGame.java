@@ -2,7 +2,8 @@ package net.poljw002.AndroidAssignment1;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
 
-public class Game {
+public class BallGame
+{
     OrthographicCamera cam = new OrthographicCamera();
     public void create () {
 
