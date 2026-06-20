@@ -1,4 +1,6 @@
 baseFloor.tmx
+circle.png
+default.fnt
 libgdx.png
 stoneWallCorner_E.png
 stoneWallCorner_E.tsx
@@ -18,3 +20,8 @@ stoneWall_W.png
 stoneWall_W.tsx
 stone_N.png
 stone_N.tsx
+tempball.png
+uiskin.atlas
+uiskin.json
+uiskin.png
+untitled.tmx
