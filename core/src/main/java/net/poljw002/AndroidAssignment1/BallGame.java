@@ -28,17 +28,25 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 public class BallGame implements Screen
 {
-    TiledMap tiledMap;
+    //all variables are created, with only few exceptions being initialised
+    TiledMap baseMap;
+    TiledMap secondMap;
+    TiledMap[] maps;
     OrthographicCamera camera;
     Sprite player;
-    TiledMapRenderer tiledMapRenderer;
+    TiledMapRenderer tiledMapRendererOne;
+    TiledMapRenderer tiledMapRendererTwo;
+    TiledMapRenderer[] renderArray;
+    int currentFloor = 0;
     TiledMapTileLayer oneWalls;
-    Stage stage = new Stage(new ScreenViewport());
     TiledMapTileLayer oneFloor;
-
+    TiledMapTileLayer twoWalls;
+    TiledMapTileLayer twoFloor;
+    Stage stage = new Stage(new ScreenViewport());
     OrthographicCamera cam = new OrthographicCamera();
 
     SpriteBatch batch;
+    SpriteBatch opacityShift;
     Ball ball;
     Main main;
     Table table;
@@ -48,10 +56,16 @@ public class BallGame implements Screen
     TextButton btn3;
     TextButton btn4;
 
+    //used to control the input, and reset as needed.
+    int[] movexy = new int[] {0,0};
+    int[] resetMove = new int[] {0,0};
+
     private Texture playerTexture;
     public BallGame(Main mainPar) {
+        //keeps the Main clas as a parameter, to later call the endscene
         main = mainPar;
 
+        //the following creates a ui table, and uses it to store the four directional movement buttons in the four corners of the screen.
         skin = new Skin(Gdx.files.internal("uiskin.json"));
 
         table = new Table();
@@ -71,6 +85,7 @@ public class BallGame implements Screen
 
         stage.addActor(table);
 
+        //gets the width, height, and the player sprite.
         float w = Gdx.graphics.getWidth();
         float h = Gdx.graphics.getHeight();
         System.out.println(Gdx.files.internal("circle.png").exists());
@@ -78,28 +93,52 @@ public class BallGame implements Screen
         player = new Sprite(playerTexture);
         player.setSize(32, 32);
 
+
+        //the player ball object is created.
         ball = new Ball();
 
-        tiledMap = new TmxMapLoader().load("baseFloor.tmx");
-        tiledMapRenderer = new IsometricTiledMapRenderer(tiledMap);
-        //tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap);
+        //opacity shift is used for the shadows of the secondfloor before it is accessed
+        opacityShift = new SpriteBatch();
 
-        camera = new OrthographicCamera();
-        camera.setToOrtho(false,w,h);
-        camera.update();
+        //the tilemaps and renderers are created and the layers are stored as variables.
 
-        MapLayers oneLayers = tiledMap.getLayers();
+        baseMap = new TmxMapLoader().load("baseFloor.tmx");
+        tiledMapRendererOne = new IsometricTiledMapRenderer(baseMap);
+
+        MapLayers oneLayers = baseMap.getLayers();
         oneWalls = (TiledMapTileLayer) oneLayers.get("Walls");
         oneFloor = (TiledMapTileLayer) oneLayers.get("Floor");
 
+        secondMap = new TmxMapLoader().load("SecondFloor.tmx");
+        tiledMapRendererTwo = new IsometricTiledMapRenderer(secondMap, opacityShift);
 
+        renderArray = new TiledMapRenderer[]{tiledMapRendererOne, tiledMapRendererTwo};
+
+        MapLayers twoLayers = secondMap.getLayers();
+        twoWalls = (TiledMapTileLayer) twoLayers.get("Walls");
+        twoFloor = (TiledMapTileLayer) twoLayers.get("Floor");
+
+
+        //the camera is created, zoomed out at 3x to see as much as possible.
+        camera = new OrthographicCamera();
+        camera.setToOrtho(false,w,h);
+        camera.zoom = 3f;
+        camera.update();
+
+
+
+
+        //the spritebatch for the player is created, and the maps are stored in an array to access using an index using the current floor
         batch = new SpriteBatch();
+        maps = new TiledMap[] {baseMap, secondMap};
+
+        //the stage is set as the input listener, and the buttons receive their click events which alter the movexy variable.
         Gdx.input.setInputProcessor(stage);
         btn1.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 System.out.println("Button 1 pressed");
-                ball.accelerate(new int[] {1,1});
+                movexy = new int[] {-1,1};
             }
         });
 
@@ -107,14 +146,14 @@ public class BallGame implements Screen
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 System.out.println("Button 2 pressed");
-                ball.accelerate(new int[] {1,-1});
+                movexy = new  int[] {1,1};
             }
         });
         btn3.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 System.out.println("Button 3 pressed");
-                ball.accelerate(new int[] {-1,1});
+                movexy = new int[] {-1,-1};
             }
         });
 
@@ -122,9 +161,11 @@ public class BallGame implements Screen
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 System.out.println("Button 4 pressed");
-                ball.accelerate(new int[] {-1,-1});
+                movexy = new int[] {1,-1};
             }
         });
+        //this is here to prevent the ball spawning out of bounds.
+        ball.x= 1000;
 
     }
 
@@ -133,21 +174,56 @@ public class BallGame implements Screen
 
     }
 
+
     @Override
     public void render(float delta) {
+        //screen is wiped
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+        //ball is accelerate according to buttons pressed, or decelerated if none.
+        ball.accelerate(movexy);
+        //checks if the ball will collide if it moves, and then either moves the ball, or halts its velocity.
+        if (!check_collision()){
+            ball.move();
+        } else{
+            ball.velocity[0] = 0;
+            ball.velocity[1] = 0;
+        }
 
-        //SpriteBatch batch = (SpriteBatch) tiledMapRenderer.getBatch();
+        //resets the variable to {0,0}
+        movexy = resetMove;
+        //ensures the camera follows the ball
+        camera.position.set(ball.x, ball.y, 0);
         camera.update();
-        tiledMapRenderer.setView(camera);
-        tiledMapRenderer.render(new int[] {0});
+
+        if(currentFloor == 0){
+            //while the currentfloor is 0 (topfloor), the secondary renderer will be darkened, and draw the second floor at a minor offset so it sits flush with the base floor.
+            camera.position.y +=128;
+            camera.update();
+            opacityShift.setColor(0.7f,0.7f,0.7f,1);
+            renderArray[1].setView(camera);
+            renderArray[1].render(new int[] {0});
+            renderArray[1].render(new int[] {1});
+            camera.position.y -= 128;
+            camera.update();
+            opacityShift.setColor(1,1,1,1);
+        }
+
+
+        //the batch and renderer are set to the camera, and then everything is drawn
+        batch.setProjectionMatrix(camera.combined);
+
+        renderArray[currentFloor].setView(camera);
+        //renders the floor
+        renderArray[currentFloor].render(new int[] {0});
         batch.begin();
+        //renders the player
         batch.draw(player, ball.x, ball.y);
         batch.end();
-        tiledMapRenderer.render(new int[] {1});
+        //renders the walls
+        renderArray[currentFloor].render(new int[] {1});
 
 
     }
@@ -157,6 +233,33 @@ public class BallGame implements Screen
         //cam.viewportWidth = VIEW_SIZE;
         //cam.viewportHeight = VIEW_SIZE * height/width;
         //cam.update();
+    }
+    public boolean check_collision(){
+        //gets the currently active maps wall layer.
+        TiledMapTileLayer layer = (TiledMapTileLayer) maps[currentFloor].getLayers().get("Walls");
+
+        //gets the x and y tile distance, originating from the top middle tile, which is 0,0 in the tmx file.
+        int tileY = 48 - ((ball.x+(int) ball.velocity[0]) / 128+(ball.y+(int) ball.velocity[1])/64)/2;
+        int tileX = ((ball.y+(int) ball.velocity[1]) / 64-(ball.x+(int) ball.velocity[0])/128)/2;
+        //converts the coordinates into the tile
+        TiledMapTileLayer.Cell cell = layer.getCell(tileX, tileY);
+
+        //if the player is in a goal zone, change floors or open the end scene
+        if(tileX<= 6 && tileY <= 6 && currentFloor == 0){
+            currentFloor = 1;
+        } else if(tileX<= 6 && tileY >= 42 && currentFloor == 1){
+            main.openEnd();
+        }
+
+        //if the cell is not null, and the tile is not null, there was a collision
+        if(cell != null && cell.getTile() != null){
+            System.out.println("cell: " +cell.getTile());
+            return true;
+        }
+        else{
+            //else, no collision
+            return false;
+        }
     }
 
     @Override
@@ -175,7 +278,8 @@ public class BallGame implements Screen
     }
 
     public void dispose() {
-        tiledMap.dispose();
+        baseMap.dispose();
+        secondMap.dispose();
         playerTexture.dispose();
     }
 }

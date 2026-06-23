@@ -10,6 +10,7 @@ public class Main extends Game {
 
     @Override
     public void create() {
+        //immediately creates a new main menu screen on start up
         setScreen(new MainMenu(this));
 
     }
@@ -17,10 +18,14 @@ public class Main extends Game {
         //ScreenUtils.clear(1, 0, 0, 1, true);
         super.render();
     }
+    //these three functions are called using this class as a variable called mainPar.
     public void openGame(){
         setScreen(new BallGame(this));
     }
     public void openMenu(){
         setScreen(new MainMenu(this));
+    }
+    public void openEnd(){
+        setScreen(new EndScene(this));
     }
 }
